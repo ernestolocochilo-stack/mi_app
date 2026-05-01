@@ -12,9 +12,11 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Flet
+      - name: Install Dependencies
         run: |
           pip install flet
+          # Es vital que flet esté actualizado para evitar bugs de rutas
+          pip install --upgrade flet 
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -22,10 +24,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # PASO CRUCIAL: Flet necesita este comando antes del build en entornos Linux
+      - name: Pre-build check
+        run: flet doctor
+
       - name: Build APK
         run: |
-          # Actualizamos la ruta a assets/icon.png
-          yes | flet build apk --product "Elite Travel" --icon assets/icon.png
+          # Usamos --verbose para ver el error real si llega a fallar
+          # Asegúrate que el archivo sea icon.png dentro de assets
+          yes | flet build apk --product "Elite Travel" --icon assets/icon.png --verbose
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
