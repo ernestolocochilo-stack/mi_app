@@ -25,8 +25,8 @@ jobs:
 
       - name: Crear APK
         run: |
-          # Flet buscará automáticamente icon.png dentro de la carpeta assets
-          flet build apk --product "Elite Travel"
+          # El comando 'yes' enviará automáticamente una "y" a todas las preguntas
+          yes | flet build apk --product "Elite Travel"
 
       - name: Subir APK Final
         uses: actions/upload-artifact@v4
