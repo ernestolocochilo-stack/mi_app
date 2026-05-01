@@ -24,9 +24,8 @@ jobs:
 
       - name: Build APK
         run: |
-          # --product especifica el nombre que verás en tu celular
-          # --icon especifica que use tu archivo icon.png
-          yes | flet build apk --product "Elite Travel" --icon icon.png
+          # Actualizamos la ruta a assets/icon.png
+          yes | flet build apk --product "Elite Travel" --icon assets/icon.png
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
