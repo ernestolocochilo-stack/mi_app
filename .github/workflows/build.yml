@@ -7,34 +7,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Python
+      - name: Instalar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Dependencies
+      - name: Instalar y Actualizar Flet
         run: |
-          pip install flet
-          # Es vital que flet esté actualizado para evitar bugs de rutas
-          pip install --upgrade flet 
+          pip install --upgrade pip
+          pip install flet --upgrade
 
-      - name: Setup Java
+      - name: Configurar Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # PASO CRUCIAL: Flet necesita este comando antes del build en entornos Linux
-      - name: Pre-build check
-        run: flet doctor
-
-      - name: Build APK
+      - name: Crear APK
         run: |
-          # Usamos --verbose para ver el error real si llega a fallar
-          # Asegúrate que el archivo sea icon.png dentro de assets
-          yes | flet build apk --product "Elite Travel" --icon assets/icon.png --verbose
-          
-      - name: Upload APK
+          # Flet buscará automáticamente icon.png dentro de la carpeta assets
+          flet build apk --product "Elite Travel"
+
+      - name: Subir APK Final
         uses: actions/upload-artifact@v4
         with:
           name: app-release
