@@ -24,8 +24,9 @@ jobs:
 
       - name: Build APK
         run: |
-          # El comando 'yes' le dice que sí a cualquier pregunta del instalador
-          yes | flet build apk
+          # --product especifica el nombre que verás en tu celular
+          # --icon especifica que use tu archivo icon.png
+          yes | flet build apk --product "Elite Travel" --icon icon.png
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
