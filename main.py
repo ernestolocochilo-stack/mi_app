@@ -1182,76 +1182,111 @@ MapasTarifas = {
     "GN - EMPALME":ListaGnEmpalme,
 
 }
+
+
 def main(page: ft.Page):
-    page.title = "Elite Travel"
+    # --- Configuración de la Pantalla ---
+    page.title = "Elite Travel - Tarifas"
     page.bgcolor = COLOR_FONDO_GRIS_PERLADO
     page.theme_mode = ft.ThemeMode.LIGHT
+
+    # Centrado absoluto en la pantalla del celular
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.padding = 20
 
-    TextoTarifa = ft.Text("Tarifa: $0.00", size=24, weight=ft.FontWeight.BOLD)
+    # --- Variables de Interfaz ---
+    TextoTarifa = ft.Text("Tarifa: $0.00", size=24, weight=ft.FontWeight.BOLD, color=COLOR_TEXTO_NEGRO)
 
-    # --- Lógica de la App ---
+    # --- Funciones de Lógica ---
     def AlCambiarOrigen(e):
         origen = DropdownOrigen.value
         if origen in MapasTarifas:
             DropdownDestino.options = [ft.dropdown.Option(d["Destino"]) for d in MapasTarifas[origen]]
             DropdownDestino.disabled = False
+            DropdownDestino.value = None
         else:
             DropdownDestino.disabled = True
+        TextoTarifa.value = "Tarifa: $0.00"
         page.update()
 
-    def Calcular(e):
+    def CalcularTarifa(e):
         origen = DropdownOrigen.value
         destino = DropdownDestino.value
         if origen and destino:
-            tarifas = MapasTarifas[origen]
-            resultado = next((x for x in tarifas if x["Destino"] == destino), None)
+            lista = MapasTarifas[origen]
+            resultado = next((item for item in lista if item["Destino"] == destino), None)
             if resultado:
                 TextoTarifa.value = f"Tarifa: ${resultado['Tarifa']:.2f}"
         page.update()
 
-    # --- Componentes ---
-    # NOTA: Usamos try/except para que si la imagen falla, la app NO se ponga en blanco
+    # --- Componentes de la Interfaz ---
+
+    # Manejo de imagen (Evita la pantalla blanca si el archivo no existe)
     try:
-        logo = ft.Image(src="icon.png", width=120, height=120, fit=ft.ImageFit.CONTAIN)
-    except:
-        logo = ft.Icon(ft.Icons.IMAGE_NOT_SUPPORTED, size=100)
+        # Nota: La ruta es solo "icon.png" porque assets_dir ya apunta a la carpeta assets
+        LogoApp = ft.Image(src="icon.png", width=120, height=120, fit=ft.ImageFit.CONTAIN)
+    except Exception:
+        LogoApp = ft.Icon(ft.Icons.DIAMOND_OUTLINED, size=80, color=COLOR_PRIMARIO_DORADO)
 
     DropdownOrigen = ft.Dropdown(
-        label="Origen",
+        label="Punto de Origen",
+        hint_text="¿De dónde sale el viaje?",
         options=[ft.dropdown.Option(k) for k in MapasTarifas.keys()],
         on_change=AlCambiarOrigen,
-        width=300
+        width=320,
+        border_color=COLOR_PRIMARIO_DORADO
     )
 
     DropdownDestino = ft.Dropdown(
         label="Destino",
+        hint_text="Seleccione destino",
         disabled=True,
-        on_change=Calcular,
-        width=300
+        on_change=CalcularTarifa,
+        width=320,
+        border_color=COLOR_PRIMARIO_DORADO
     )
 
-    # --- Diseño Final ---
-    page.add(
-        ft.Container(
-            content=ft.Column([
-                logo,
+    # --- Estructura Visual ---
+    ContenedorPrincipal = ft.Container(
+        content=ft.Column(
+            controls=[
+                LogoApp,
                 ft.Text("ÉLITE TRAVEL", size=28, weight=ft.FontWeight.BOLD, color=COLOR_PRIMARIO_DORADO),
-                ft.Divider(),
+                ft.Divider(height=10, thickness=2, color=COLOR_PRIMARIO_DORADO),
+                ft.Text("CALCULADORA DE PRECIOS", size=14, color=ft.Colors.GREY_700),
+
+                ft.Container(height=10),  # Espacio
+
                 DropdownOrigen,
                 DropdownDestino,
+
                 ft.Container(height=20),
+
+                # Cuadro de Resultado
                 ft.Container(
                     content=TextoTarifa,
-                    bgcolor=COLOR_PRIMARIO_DORADO,
                     padding=20,
-                    border_radius=10
+                    bgcolor=COLOR_PRIMARIO_DORADO,
+                    border_radius=15,
+                    alignment=ft.alignment.center,
+                    width=280,
+                    shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK26)
                 )
-            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            padding=20
-        )
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=15
+        ),
+        padding=30,
+        bgcolor=ft.Colors.WHITE,
+        border_radius=20,
+        shadow=ft.BoxShadow(blur_radius=15, color=ft.Colors.BLACK12),
+        width=380
     )
 
+    page.add(ContenedorPrincipal)
+
+
 if __name__ == "__main__":
-    # IMPORTANTE: assets_dir="assets" permite que 'icon.png' se encuentre
+    # IMPORTANTE: assets_dir="assets" es lo que permite usar imágenes locales
     ft.app(target=main, assets_dir="assets")
